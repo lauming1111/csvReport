@@ -55,6 +55,7 @@ const timePickerList = () => {
 
 // Generate JSON records
 const dailyJSON = (secInDay) => [...Array(config.maxRecords).keys()].map((record) => {
+    console.log(`generating ${record}/${config.maxRecords} ${((record / config.maxRecords) * 100).toFixed(3)}%`);
     const customerID = randomNumber(config.customerID.range[0], config.customerID.range[1]);
     return {
         ID: record,
@@ -84,7 +85,7 @@ const dailyJSON = (secInDay) => [...Array(config.maxRecords).keys()].map((record
     console.log(`generating json`);
     const data = useFaster && dailyJSON(secInDay);
     await Promise.map([...Array(dateRange).keys()], async (date) => {
-        const filename = moment(config.workingDate.since, config.workingDate.format).add(date, 'day').format(config.outputFormat);       
+        const filename = moment(config.workingDate.since, config.workingDate.format).add(date, 'day').format(config.outputFormat);
         // const data = dailyJSON(secInDay);
         console.log(`parsing ${filename} json to csv`);
         const csv = parse(useFaster ? data : dailyJSON(secInDay), { fields: Object.keys(data[0]), header: true });
