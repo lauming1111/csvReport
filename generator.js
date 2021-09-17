@@ -1,4 +1,3 @@
-const { parseAsync, parse } = require('json2csv');
 const fs = require('fs');
 const { Promise } = require('bluebird');
 const path = require('path');
@@ -13,6 +12,7 @@ const config = {
     // date format that following Moment.js
     outputFormat: "YYYY-MM-DD",
     maxRecords: 1000000,
+    csvHeaders: ['ID', 'randomTime', 'customerID', 'serviceID', 'country', 'usage'],
     workingDate: {
         since: "1-9-2020",
         to: "31-8-2021",
@@ -48,25 +48,26 @@ const timePickerList = () => {
     for (let i = 0; r.length < config.maxRecords; i++) {
         r = [...r, ...cache];
     }
-    // return r;
+    // timestamp from old to new
     return r.sort();
-    // });
 };
 
 // Generate JSON records
-const dailyJSON = (secInDay) => [...Array(config.maxRecords).keys()].map((record) => {
-    console.log(`generating ${record}/${config.maxRecords} ${((record / config.maxRecords) * 100).toFixed(3)}%`);
-    const customerID = randomNumber(config.customerID.range[0], config.customerID.range[1]);
-    return {
-        ID: record,
-        randomTime: moment(secInDay.shift(), "X").format(config.timeFormat),
-        customerID,
-        serviceID: `${customerID}${randomNumber(config.serviceID.range[0], config.serviceID.range[1]).toString().padStart(3, 0)}`,
-        country: config.country[randomNumber(0, config.country.length - 1)],
-        usage: randomNumber(config.usage.range[0], config.usage.range[1]),
-    };
-});
-
+const whileLoopJSON = async (filename, secInDay) => {
+    let start = 0;
+    while (start < config.maxRecords) {       
+        const customerID = randomNumber(config.customerID.range[0], config.customerID.range[1]);
+        // need to follow the header ordering
+        await fs.promises.appendFile(path.join(config.csvExportTo, `${filename}.csv`), [
+            start,
+            moment(secInDay[start], "X").format(config.timeFormat),
+            `${customerID}${randomNumber(config.serviceID.range[0], config.serviceID.range[1]).toString().padStart(3, 0)}`,
+            config.country[randomNumber(0, config.country.length - 1)],
+            randomNumber(config.usage.range[0], config.usage.range[1]),
+        ].join() + '\n');
+        start++;
+    }
+};
 
 (async () => {
     const startTime = moment.now();
@@ -78,24 +79,22 @@ const dailyJSON = (secInDay) => [...Array(config.maxRecords).keys()].map((record
     }
 
     const secInDay = timePickerList(); // generate time that can share to all rows
-    const useFaster = process.argv[2] === 'true'; // if true, all csv have same data
+    console.log(`generated ${secInDay.length} timestamp`);
+
 
     // Export CSV
     const dateRange = moment(config.workingDate.to, config.workingDate.format).diff(moment(config.workingDate.since, config.workingDate.format), 'days');
     console.log(`generating json`);
-    const data = useFaster && dailyJSON(secInDay);
     await Promise.map([...Array(dateRange).keys()], async (date) => {
         const filename = moment(config.workingDate.since, config.workingDate.format).add(date, 'day').format(config.outputFormat);
-        // const data = dailyJSON(secInDay);
-        console.log(`parsing ${filename} json to csv`);
-        const csv = parse(useFaster ? data : dailyJSON(secInDay), { fields: Object.keys(data[0]), header: true });
 
-        console.log(`Writing ${filename}.csv to ${config.csvExportTo}`);
-        fs.writeFileSync(path.join(config.csvExportTo, `${filename}.csv`), csv);
-    }, { concurrency: config.maxConcurrency || os.cpus.length });
-
-
-    // const csvBody = Object.keys(key).map(header => { r; });
+        console.log(`Writing headers ${config.csvHeaders} ${filename}.csv to ${config.csvExportTo}`);
+        // Recreate file and add header in the csv
+        await fs.promises.writeFile(path.join(config.csvExportTo, `${filename}.csv`), config.csvHeaders.join() + '\n');
+        console.log(`Writing contents ${config.csvHeaders} ${filename}.csv to ${config.csvExportTo}`);
+        // Write random records
+        await whileLoopJSON(filename, secInDay);
+    }, { concurrency: config.maxConcurrency || os.cpus().length }); // run in parallel
 
     const endTime = moment.now();
     console.log(`Performance:
