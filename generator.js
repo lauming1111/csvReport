@@ -4,33 +4,7 @@ const path = require('path');
 const os = require('os');
 const moment = require('moment');
 
-const config = {
-    // run parallel job base on CPU   
-    maxConcurrency: 0,
-    // csv export to
-    csvExportTo: './tmp',
-    // date format that following Moment.js
-    outputFormat: "YYYY-MM-DD",
-    maxRecords: 1000000,
-    csvHeaders: ['ID', 'randomTime', 'customerID', 'serviceID', 'country', 'usage'],
-    workingDate: {
-        since: "1-9-2020",
-        to: "31-8-2021",
-        format: 'DD-M-YYYY'
-    },
-    // time format that following Moment.js
-    timeFormat: "HH:mm:ss",
-    customerID: {
-        range: [1, 1000]
-    },
-    serviceID: {
-        range: [1, 100]
-    },
-    country: ['CN', 'UK', 'US', 'FR', 'DE', 'ES', 'CA', 'IN', 'JP', 'KR', 'SG'],
-    usage: {
-        range: [1, 1000000000]
-    },
-};
+const config = require('./config');
 
 const randomNumber = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -55,12 +29,13 @@ const timePickerList = () => {
 // Generate JSON records
 const whileLoopJSON = async (filename, secInDay) => {
     let start = 0;
-    while (start < config.maxRecords) {       
+    while (start < config.maxRecords) {
         const customerID = randomNumber(config.customerID.range[0], config.customerID.range[1]);
         // need to follow the header ordering
         await fs.promises.appendFile(path.join(config.csvExportTo, `${filename}.csv`), [
             start,
             moment(secInDay[start], "X").format(config.timeFormat),
+            customerID,
             `${customerID}${randomNumber(config.serviceID.range[0], config.serviceID.range[1]).toString().padStart(3, 0)}`,
             config.country[randomNumber(0, config.country.length - 1)],
             randomNumber(config.usage.range[0], config.usage.range[1]),
