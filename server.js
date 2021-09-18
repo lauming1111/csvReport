@@ -5,7 +5,7 @@ const cors = require('cors');
 const moment = require('moment');
 const { Promise } = require('bluebird');
 const NodeCache = require("node-cache");
-const csv = require('csvtojson');
+const os = require('os');
 
 const config = require('./config');
 const { generator } = require('./generator');
@@ -26,9 +26,7 @@ app.get('/listFile', cors(), async (req, res) => {
     await Promise.map([...Array(monthRange).keys()], async (newMonth) => {
       const month = moment(config.workingDate.since, config.workingDate.format).add(newMonth, 'months').format('YYYY-MM');
       groupBy[month] = csvFiles.filter(r => r.startsWith(month));
-    }, { concurrency: 8 }); // run in parallel
-    // const groupByMonth = csvFiles.filter
-    // console.log(`found ${groupBy} from ${config.csvExportTo}`);
+    }, { concurrency: config.maxConcurrency || os.cpus().length }); // run in parallel
 
     res.json(groupBy);
   } catch (e) {
@@ -40,6 +38,7 @@ app.post('/readFile', cors(), async (req, res) => {
   const { month, data } = req.body;
   let csvInMonths = [];
 
+  console.log( month, data);
   if (!cache.has(month)) {
     console.log(`read ${month} from ${config.csvExportTo}`);
     for (const date of data[month]) {
@@ -56,8 +55,6 @@ app.post('/readFile', cors(), async (req, res) => {
     csvInMonths = cache.get(month);
   }
 
-
-  // console.log(csvInMonths);
   res.json({
     month,
     data: csvInMonths,
@@ -72,22 +69,23 @@ app.post('/readCSVs', cors(), async (req, res) => {
 });
 
 app.get('/runGenertor', cors(), async (req, res) => {
-  // console.log(config);
+  // clear all cache before regeneration
+  cache.flushAll();
+  // generate follow by config.js settings
   generator();
 
   res.json({
     running: true,
     config,
-    range: moment(config.workingDate.to, config.workingDate.format).diff(moment(config.workingDate.since, config.workingDate.format), 'days'),
+    range: moment(config.workingDate.to, config.workingDate.format).diff(moment(config.workingDate.since, config.workingDate.format), 'days'), // count days in the range
     status: 0,
   });
 });
 
+// count CSVs in folder for progress bar
 app.get('/statusGenertor', cors(), async (req, res) => {
   const filesInDir = await fs.promises.readdir(config.csvExportTo);
   const csvFiles = filesInDir.filter(r => path.extname(r) === '.csv');
-
-  console.log(filesInDir, csvFiles.length);
 
   res.json({
     running: true,

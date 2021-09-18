@@ -1,10 +1,4 @@
 import React, { useEffect, useRef, Component, classes } from 'react';
-import { CsvToHtmlTable } from 'react-csv-to-table';
-import { Promise } from 'bluebird';
-import Button from '@mui/material/Button';
-import { Chart } from './chart';
-import Stack from '@mui/material/Stack';
-import TodayIcon from '@mui/icons-material/Today';
 import './body.css';
 
 function CsvTable(selected, action) {

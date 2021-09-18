@@ -5,7 +5,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
-import ListIcon from '@mui/icons-material/List';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import './body.css';
 import csv from 'csvtojson';
@@ -98,7 +98,9 @@ function ListFiles() {
         setConfig(r.config);
         await getStatus(r.range);
         setGenerating(false);
-        await handleClickMonth(month);
+        console.log(data);
+        !month && await handleClickMonth(Object.keys(data)[0]);
+        month && await handleClickMonth(month)
       });
   };
 
@@ -150,7 +152,7 @@ function ListFiles() {
       >
         <ListItemButton onClick={() => handleClickGenertor()}>
           <ListItemIcon>
-            <DateRangeIcon />
+            <AutorenewIcon />
           </ListItemIcon>
           <ListItemText primary={'Generator'} />
         </ListItemButton>
