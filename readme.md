@@ -17,14 +17,14 @@
 6. usage random number from 1 to 1000000000
 
 ## How to run generator:
-update some parameters in run.js (optional)
+update some parameters in config.js (optional)
 
 ```
 npm install
-node generator.js
+node run-generator.js
 ```
 
-# Analyzer
+# React csv analyzer
 
 1. Customer Monthly Usage report
 
@@ -33,10 +33,9 @@ node generator.js
 3. Country Monthly Usage % Distribution report
 
 ## How to run generator:
-update some parameters in run.js (optional)
+update some parameters in config.js (optional)
 
 ```
-cd report
-npm install
-npm start
+npm run client-install
+npm run client
 ```

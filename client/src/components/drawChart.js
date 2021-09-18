@@ -7,63 +7,70 @@ import TodayIcon from '@mui/icons-material/Today';
 import './body.css';
 import csv from 'csvtojson';
 
-function DrawChart(selected) {
-  const [usingChart, setUsingChart] = React.useState(false);
+function DrawChart(selected, action) {
   const { month, csvData } = selected;
+  useEffect(() => {
+    setUsingChart(mur(csvData));
+  }, [selected.csvData]);
 
-
-  let chart = null;
-
-  switch (usingChart) {
-    case 'mur':
-      chart = <Chart chartData={{
-        labels: csvData.map(r => r.filename.replace('.csv', '')),
-        datasets: [
-          {
-            label: "Usage",
-            data: csvData.map(r => r.data.map(rr => rr.usage).reduce((acc, value) => +acc + +value, 0)).flat(1),
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)'
-            ]
-          },
+  const mur = (csvArray) => <Chart chartData={{
+    labels: csvArray.map(r => r.filename.replace('.csv', '')),
+    datasets: [
+      {
+        label: "Usage",
+        data: csvArray.map(r => { console.log(r); return r.data.map(rr => rr.usage).reduce((acc, value) => +acc + +value, 0); }).flat(1),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)'
         ]
-      }} />;
-      break;
-    case 't3smur':
-      chart = null;
-      break;
-    case 'cmudr':
-      chart = null;
-      break;
-    default:
-      chart = <Chart chartData={{
-        labels: csvData.map(r => r.filename.replace('.csv', '')),
-        datasets: [
-          {
-            label: "Usage",
-            data: csvData.map(r => r.data.map(rr => rr.usage).reduce((acc, value) => +acc + +value, 0)).flat(1),
-            backgroundColor: [
-              'rgba(255, 99, 132, 0.2)'
-            ]
-          },
+      },
+    ]
+  }} title={"Customer Monthly Usage report"} />;
+
+  const t3smur = (csvArray) => <Chart chartData={{
+    labels: csvArray.map(r => r.filename.replace('.csv', '')),
+    datasets: [
+      {
+        label: "Usage",
+        data: csvArray.map(r => r.data.map(rr => rr.usage).reduce((acc, value) => +acc + +value, 0)).flat(1),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)'
         ]
-      }} />;
-  }
+      },
+    ]
+  }} title={"Customer Top 3 Services Monthly Usage report"} />;
+
+  const cmudr = (csvArray) => <Chart chartData={{
+    labels: csvArray.map(r => r.filename.replace('.csv', '')),
+    datasets: [
+      {
+        label: "Usage",
+        data: csvArray.map(r => r.data.map(rr => rr.usage).reduce((acc, value) => +acc + +value, 0)).flat(1),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)'
+        ]
+      },
+    ]
+  }} title={"Country Monthly Usage % Distribution report"} />;
+  const [usingChart, setUsingChart] = React.useState(mur(csvData));
 
 
   return {
+    drawChartAction: {
+      setUsingChart
+    },
     renderCharts: (
       <div className={'main'}>
         <h1 className={'title'}>{month}</h1>
+        <a style={{ color: 'grey' }} >Data will be cached in server for 60 sec when you fetch a new selection.</a>
         <div>
           <Stack direction="row" spacing={2}>
-            <Button variant="contained" className={'reportButton'} onClick={() => setUsingChart('mur')}>Customer Monthly Usage report</Button>
-            <Button variant="contained" className={'reportButton'} onClick={() => setUsingChart('t3smur')}>Customer Top 3 Services Monthly Usage report</Button>
-            <Button variant="contained" className={'reportButton'} onClick={() => setUsingChart('cmudr')}>Country Monthly Usage % Distribution report</Button>
+            <Button variant="contained" className={'reportButton'} onClick={() => setUsingChart(mur(csvData))}>Customer Monthly Usage report</Button>
+            <Button variant="contained" className={'reportButton'} onClick={() => setUsingChart(t3smur(csvData))}>Customer Top 3 Services Monthly Usage report</Button>
+            <Button variant="contained" className={'reportButton'} onClick={() => setUsingChart(cmudr(csvData))}>Country Monthly Usage % Distribution report</Button>
           </Stack>
         </div>
         <div className={'chart'}>
-          {chart}
+          {usingChart}
 
         </div>
       </div>

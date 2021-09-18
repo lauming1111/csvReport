@@ -11,8 +11,9 @@ import './body.css';
 
 function Status(selected, action) {
     const { status } = selected;
+    const { fetching, generating } = action;
 
-    console.log(status);
+    console.log(fetching, generating);
 
 
     return {
@@ -22,7 +23,8 @@ function Status(selected, action) {
                     <PacmanLoader size={35} color={"#123abc"} speedMultiplier={1.5} />
                 </div>
 
-                <div onChange={action}>Generating CSVs, {status}%...</div>
+                {generating && <div onChange={action}>Generating CSVs, {status}%...</div>}
+                {fetching && <div onChange={action}>Generating chart...</div>}
             </div>
 
         )

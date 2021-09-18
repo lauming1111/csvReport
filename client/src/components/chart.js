@@ -1,6 +1,9 @@
 import { Bar } from "react-chartjs-2";
 
-export const Chart = ({ chartData }) => {
+export const Chart = ({ chartData, title }) => {
+  // const chartData = {};
+  // const title = '';
+
   return (
     <div>
       <Bar
@@ -28,7 +31,7 @@ export const Chart = ({ chartData }) => {
           plugins: {
             title: {
               display: true,
-              text: "Customer Monthly Usage report"
+              text: title
             },
             legend: {
               display: true,

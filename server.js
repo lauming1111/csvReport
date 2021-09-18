@@ -5,6 +5,7 @@ const cors = require('cors');
 const moment = require('moment');
 const { Promise } = require('bluebird');
 const NodeCache = require("node-cache");
+const csv = require('csvtojson');
 
 const config = require('./config');
 const { generator } = require('./generator');
@@ -49,7 +50,7 @@ app.post('/readFile', cors(), async (req, res) => {
       });
     }
     console.log(`add csv in${month} to cache `);
-    cache.set(month, csvInMonths, 120000);
+    cache.set(month, csvInMonths, 60000);
   } else {
     console.log(`using cache to read ${month}`);
     csvInMonths = cache.get(month);
@@ -60,6 +61,13 @@ app.post('/readFile', cors(), async (req, res) => {
   res.json({
     month,
     data: csvInMonths,
+  });
+});
+
+app.post('/readCSVs', cors(), async (req, res) => {
+  console.log(`readCSVs ${path.join(config.csvExportTo, req.body.date)}`);
+  res.json({
+    data: fs.readFileSync(path.join(config.csvExportTo, req.body.date), 'utf8'),
   });
 });
 

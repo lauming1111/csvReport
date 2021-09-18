@@ -5,7 +5,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
-import { Chart } from './chart';
+import ListIcon from '@mui/icons-material/List';
 import DateRangeIcon from '@mui/icons-material/DateRange';
 import './body.css';
 import csv from 'csvtojson';
@@ -13,11 +13,18 @@ import csv from 'csvtojson';
 function ListFiles() {
   const [data, setData] = React.useState([]);
   const [csvData, setCsvData] = React.useState([]);
+  const [csvFile, setCsvFile] = React.useState('');
+  const [date, setDate] = React.useState('');
   const [month, setMonth] = React.useState('');
   const [config, setConfig] = React.useState({});
   const [status, setStatus] = React.useState(0);
+  const [csvShowTable, setShowTable] = React.useState(false);
   const [fetching, setFetching] = React.useState(false);
   const [generating, setGenerating] = React.useState(false);
+
+  useEffect(() => {
+    listFile();
+  }, []);
 
   // list all csv group by month
   const listFile = () => {
@@ -27,19 +34,12 @@ function ListFiles() {
       });
   };
 
-  useEffect(() => {
-    listFile();
-  }, []);
-
-
   // pass selected month
   const handleClickMonth = async (month) => {
     setMonth(month);
+    // drawChartAction('');
     setFetching(true);
-    const cache = [];
 
-    // for (const date of data[month]) {
-    // console.log(date);
     await fetch('/readFile', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
@@ -80,8 +80,10 @@ function ListFiles() {
           // console.log(`statusGenertor status ${r.status}/${range}`);
           setStatus((count / range * 100).toFixed(2));
           count = r.status;
+          listFile();
         });
     }
+    setStatus(0);
   };
 
   const handleClickGenertor = () => {
@@ -96,6 +98,26 @@ function ListFiles() {
         setConfig(r.config);
         await getStatus(r.range);
         setGenerating(false);
+        await handleClickMonth(month);
+      });
+  };
+
+  const handleListCSVs = async (date) => {
+    setShowTable(true);
+    await fetch('/readCSVs', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        date,
+      }),
+    })
+      .then(async (r) => {
+        r = await r.json();
+        console.log(r);
+        setDate(date);
+        setCsvFile(r.data.split('\n').map((r, i) => (
+          <p key={i}>{r}</p>
+        )));
       });
   };
 
@@ -104,10 +126,13 @@ function ListFiles() {
       config,
       csvData,
       status,
-      month
+      month,
+      date,
+      csvFile,
     },
     action: {
       listFile,
+      csvShowTable,
       fetching,
       generating,
     },
@@ -137,6 +162,16 @@ function ListFiles() {
               </ListItemIcon>
               <ListItemText primary={month} />
             </ListItemButton>
+
+            {/* {
+              data[month].map((date, index) => (<List component="div" >
+                <ListItemButton sx={{ pl: 4 }} onClick={() => handleListCSVs(date)}>
+                  <ListIcon />
+                  <ListItemText primary={date.replace('.csv', '')} />
+                </ListItemButton>
+              </List>))
+            } */}
+
           </div>)
         }
       </List>

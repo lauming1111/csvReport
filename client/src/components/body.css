@@ -21,13 +21,19 @@
     float: left;
     margin-left: 1.5rem;
     max-height: 100vh;
-    overflow-y: hidden;
+  
 }
 
 .title {
     min-height: 3rem;
 }
 
+.csv {
+    float: left;
+    margin-left: 11.5rem;
+    overflow-y: 100vh;
+    max-height: 100vh;
+}
 
 .chart {
     min-height: 70rem;
