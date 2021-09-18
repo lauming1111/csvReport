@@ -16,13 +16,23 @@
 
 6. usage random number from 1 to 1000000000
 
-## How to run generator:
+## How to run generator (CLI):
 update some parameters in config.js (optional)
 
 ```
 npm install
-node run-generator.js
+node run-generator.js # default export to ./tmp folder
 ```
+
+## How to run generator (React):
+1. update some parameters in config.js (optional)
+
+```
+npm run client-install
+npm run client
+```
+2. Go to web browser E.g `http://127.0.0.1:3000/`
+3. Click `Generator` in Left hand corner
 
 # React csv analyzer
 
@@ -32,7 +42,7 @@ node run-generator.js
 
 3. Country Monthly Usage % Distribution report
 
-## How to run generator:
+## How to run analyzer:
 update some parameters in config.js (optional)
 
 ```
