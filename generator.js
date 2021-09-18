@@ -44,36 +44,38 @@ const whileLoopJSON = async (filename, secInDay) => {
     }
 };
 
-(async () => {
-    const startTime = moment.now();
-    console.log(`Starting with config ${JSON.stringify(config, null, 2)}`);
+module.exports = {
+    generator: async () => {
+        const startTime = moment.now();
+        console.log(`Starting with config ${JSON.stringify(config, null, 2)}`);
 
-    // create folder if not exist
-    if (!fs.existsSync(config.csvExportTo)) {
+        // Recreate folder if not exist
+        fs.rmdirSync(config.csvExportTo, { recursive: true });
         fs.mkdirSync(config.csvExportTo, { recursive: true });
+
+        const secInDay = timePickerList(); // generate time that can share to all rows
+        console.log(`generated ${secInDay.length} timestamp`);
+
+
+        // Export CSV
+        const dateRange = moment(config.workingDate.to, config.workingDate.format).diff(moment(config.workingDate.since, config.workingDate.format), 'days');
+        console.log(`generating json`);
+        await Promise.map([...Array(dateRange).keys()], async (date) => {
+            // await Promise.delay(5000)
+            const filename = moment(config.workingDate.since, config.workingDate.format).add(date, 'day').format(config.outputFormat);
+
+            console.log(`Writing headers ${config.csvHeaders} ${filename}.csv to ${config.csvExportTo}`);
+            // Recreate file and add header in the csv
+            await fs.promises.writeFile(path.join(config.csvExportTo, `${filename}.csv`), config.csvHeaders.join() + '\n');
+            console.log(`Writing contents ${config.csvHeaders} ${filename}.csv to ${config.csvExportTo}`);
+            // Write random records
+            await whileLoopJSON(filename, secInDay);
+        }, { concurrency: config.maxConcurrency || os.cpus().length }); // run in parallel
+
+        const endTime = moment.now();
+        console.log(`Performance:
+    start time: ${startTime}
+    end time ${endTime}
+    duration: ${(endTime - startTime) / 1000} sec`);
     }
-
-    const secInDay = timePickerList(); // generate time that can share to all rows
-    console.log(`generated ${secInDay.length} timestamp`);
-
-
-    // Export CSV
-    const dateRange = moment(config.workingDate.to, config.workingDate.format).diff(moment(config.workingDate.since, config.workingDate.format), 'days');
-    console.log(`generating json`);
-    await Promise.map([...Array(dateRange).keys()], async (date) => {
-        const filename = moment(config.workingDate.since, config.workingDate.format).add(date, 'day').format(config.outputFormat);
-
-        console.log(`Writing headers ${config.csvHeaders} ${filename}.csv to ${config.csvExportTo}`);
-        // Recreate file and add header in the csv
-        await fs.promises.writeFile(path.join(config.csvExportTo, `${filename}.csv`), config.csvHeaders.join() + '\n');
-        console.log(`Writing contents ${config.csvHeaders} ${filename}.csv to ${config.csvExportTo}`);
-        // Write random records
-        await whileLoopJSON(filename, secInDay);
-    }, { concurrency: config.maxConcurrency || os.cpus().length }); // run in parallel
-
-    const endTime = moment.now();
-    console.log(`Performance:
-start time: ${startTime}
-end time ${endTime}
-duration: ${(endTime - startTime) / 1000} sec`);
-})();
+};

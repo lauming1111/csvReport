@@ -2,11 +2,11 @@ module.exports = {
     // run parallel job base on CPU   
     maxConcurrency: 0,
     // csv export to, only support full path
-    csvExportTo: '/tmp',
+    csvExportTo: './csv',
     // date format that following Moment.js
     outputFormat: "YYYY-MM-DD",
     // maxRecords: 1000000,
-    maxRecords: 5,
+    maxRecords: 10,
     csvHeaders: ['ID', 'randomTime', 'customerID', 'serviceID', 'country', 'usage'],
     workingDate: {
         since: "1-9-2020",

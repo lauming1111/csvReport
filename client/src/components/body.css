@@ -1,0 +1,46 @@
+.list {
+    float: left;
+    width: 20rem;
+    top: 0;
+    bottom: 0;
+    min-height: 100vh;
+    max-height: 100vh;
+    overflow-y: scroll;
+}
+
+.spinnerPage {
+    margin-left: 50%;
+}
+
+.spinner {
+    padding-top: 20rem;
+    padding-bottom: 13rem;
+}
+
+.main {
+    float: left;
+    margin-left: 1.5rem;
+    max-height: 100vh;
+    overflow-y: hidden;
+}
+
+.title {
+    min-height: 3rem;
+}
+
+
+.chart {
+    min-height: 70rem;
+    max-height: 95vh;
+    width: 80%;
+    position: absolute;
+    font-size: 2rem;
+}
+
+.dateNav {
+    min-height: 100%;
+}
+
+.bgc {
+    background-color: rgb(213, 211, 211);
+}
