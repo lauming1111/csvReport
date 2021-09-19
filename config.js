@@ -5,9 +5,9 @@ module.exports = {
     csvExportTo: './csv',
     // date format that following Moment.js
     outputFormat: "YYYY-MM-DD",
-    // maxRecords: 100000,
+    maxRecords: 100000,
     // for testing env
-    maxRecords: 10000,
+    // maxRecords: 10000,
     csvHeaders: ['ID', 'randomTime', 'customerID', 'serviceID', 'country', 'usage'],
     workingDate: {
         since: "1-9-2020",
