@@ -50,10 +50,10 @@ function ListFiles() {
     })
       .then(async (r) => {
         const { data } = await r.json();
-
         await Promise.map(data, (rr) => csv()
           .fromString(rr.data)
           .then((jsonObj) => {
+            console.log(`convert CSV ${rr.filename} to JSON`);
             return {
               filename: rr.filename,
               data: jsonObj

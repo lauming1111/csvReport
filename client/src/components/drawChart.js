@@ -31,6 +31,10 @@ function DrawChart(selected, action) {
           display: true,
           text: "Customer Monthly Usage report"
         },
+        subtitle: {
+          display: true,
+          text: `Total Usage ${csvArray.map(r => { return r.data.map(rr => rr.usage).reduce((acc, value) => +acc + +value, 0); }).flat(1).reduce((acc, value) => +acc + +value, 0)}`
+        },
         legend: {
           display: true,
           position: "bottom"

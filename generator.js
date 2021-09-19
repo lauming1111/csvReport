@@ -28,7 +28,7 @@ const timePickerList = () => {
 
 // Generate JSON records
 const whileLoopJSON = async (filename, secInDay) => {
-    let start = 0;
+    let start = 1;
     while (start < config.maxRecords) {
         const customerID = randomNumber(config.customerID.range[0], config.customerID.range[1]);
         // need to follow the header ordering
