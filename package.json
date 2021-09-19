@@ -5,11 +5,11 @@
   "main": "server.js",
   "scripts": {
     "client-install": "cd client && npm install",
-    "all": "npm install && cd client && npm install",
+    "install-all": "npm install && cd client && npm install",
     "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "services": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Brad Traversy",
   "license": "MIT",
@@ -20,8 +20,8 @@
     "@babel/preset-env": "^7.15.6",
     "@babel/preset-react": "^7.14.5",
     "@ramonak/react-progress-bar": "^3.2.1",
-    "bluebird": "^3.7.2",
     "chart.js": "^3.5.1",
+    "bluebird": "^3.7.2",
     "concurrently": "^3.5.1",
     "cors": "^2.8.5",
     "csvtojson": "^2.0.10",

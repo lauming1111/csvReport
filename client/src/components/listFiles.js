@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, Component, classes } from 'react';
+import React, { useEffect } from 'react';
 import { Promise } from 'bluebird';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -13,12 +13,9 @@ import csv from 'csvtojson';
 function ListFiles() {
   const [data, setData] = React.useState([]);
   const [csvData, setCsvData] = React.useState([]);
-  const [csvFile, setCsvFile] = React.useState('');
-  const [date, setDate] = React.useState('');
   const [month, setMonth] = React.useState('');
   const [config, setConfig] = React.useState({});
   const [status, setStatus] = React.useState(0);
-  const [csvShowTable, setShowTable] = React.useState(false);
   const [fetching, setFetching] = React.useState(false);
   const [generating, setGenerating] = React.useState(false);
 
@@ -30,26 +27,29 @@ function ListFiles() {
   const listFile = () => {
     fetch('listFile')
       .then(async (r) => {
-        setData(await r.json());
+        r = await r.json();
+        setData(r);
+        // handle default data
+        handleClickMonth(Object.keys(r)[0], r);
       });
   };
 
   // pass selected month
-  const handleClickMonth = async (month) => {
+  const handleClickMonth = async (month, defaultData) => {
+    console.log(`selected ${month}`);
     setMonth(month);
-    // drawChartAction('');
     setFetching(true);
 
     await fetch('/readFile', {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        data,
+        data: defaultData || data,
         month,
       }),
     })
       .then(async (r) => {
-        const { month, data } = await r.json();
+        const { data } = await r.json();
 
         await Promise.map(data, (rr) => csv()
           .fromString(rr.data)
@@ -62,7 +62,6 @@ function ListFiles() {
           .then((rr) => {
             setCsvData(rr);
           });
-
         setFetching(false);
       });
   };
@@ -80,10 +79,8 @@ function ListFiles() {
           // console.log(`statusGenertor status ${r.status}/${range}`);
           setStatus((count / range * 100).toFixed(2));
           count = r.status;
-          listFile();
         });
     }
-    setStatus(0);
   };
 
   const handleClickGenertor = () => {
@@ -92,6 +89,7 @@ function ListFiles() {
       return;
     }
     setGenerating(true);
+    setStatus(0);
     fetch('/runGenertor')
       .then((r) => r.json())
       .then(async (r) => {
@@ -99,27 +97,6 @@ function ListFiles() {
         await getStatus(r.range);
         setGenerating(false);
         console.log(data);
-        !month && await handleClickMonth(Object.keys(data)[0]);
-        month && await handleClickMonth(month)
-      });
-  };
-
-  const handleListCSVs = async (date) => {
-    setShowTable(true);
-    await fetch('/readCSVs', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        date,
-      }),
-    })
-      .then(async (r) => {
-        r = await r.json();
-        console.log(r);
-        setDate(date);
-        setCsvFile(r.data.split('\n').map((r, i) => (
-          <p key={i}>{r}</p>
-        )));
       });
   };
 
@@ -129,12 +106,9 @@ function ListFiles() {
       csvData,
       status,
       month,
-      date,
-      csvFile,
     },
     action: {
       listFile,
-      csvShowTable,
       fetching,
       generating,
     },

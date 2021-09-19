@@ -1,4 +1,4 @@
-import { Bar } from "react-chartjs-2";
+import { Bar, Line } from "react-chartjs-2";
 
 export const Chart = ({ chartData, title }) => {
   // const chartData = {};

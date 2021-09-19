@@ -8,11 +8,11 @@
 
 2. random unique time that greater than the old one
 
-3. customer id random number between 1 and 1000
+3. customer id, random number between 1 and 1000
 
-4. service id  customer id with random number that between 1 and 100
+4. service id, add customer id with random number that between 1 and 100
 
-5. country code from 'CN', 'UK', 'US', 'FR', 'DE', 'ES', 'CA', 'IN', 'JP', 'KR', 'SG'
+5. country code one of 'CN', 'UK', 'US', 'FR', 'DE', 'ES', 'CA', 'IN', 'JP', 'KR', 'SG'
 
 6. usage random number from 1 to 1000000000
 
@@ -46,6 +46,6 @@ npm run client
 update some parameters in config.js (optional)
 
 ```
-npm run client-install
-npm run client
+npm run install-all 
+npm run services
 ```

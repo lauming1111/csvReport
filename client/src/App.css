@@ -1,0 +1,29 @@
+.flex {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.list {
+    display: flex;
+    flex: 15%;
+    background-color: rgb(213, 211, 211);
+    /* position:fixed; */
+    min-height: 100vh;
+    bottom: 100%;
+    /* overflow-y: auto; */
+}
+
+.body {
+    flex: 85%;
+    /* flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 85%; */
+    padding-right: 3rem;
+    padding-left: 2rem;
+}
+
+.progress {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
