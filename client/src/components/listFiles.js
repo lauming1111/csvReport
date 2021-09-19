@@ -30,7 +30,7 @@ function ListFiles() {
         r = await r.json();
         setData(r);
         // handle default data
-        handleClickMonth(Object.keys(r)[0], r);
+        !month && handleClickMonth(Object.keys(r)[0], r);
       });
   };
 
