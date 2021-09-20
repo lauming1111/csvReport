@@ -35,34 +35,37 @@ app.get('/listFile', cors(), async (req, res) => {
 });
 
 app.post('/readFile', cors(), async (req, res) => {
-  const { month, data } = req.body;
-  let csvInMonths = [];
+  try {
+    const { month, data } = req.body;
+    let csvInMonths = [];
 
-  if (!cache.has(month)) {
-    console.log(`read ${month} from ${config.csvExportTo}`);
-    for (const date of data[month]) {
-      try {
+    if (!cache.has(month)) {
+      console.log(`read ${month} from ${config.csvExportTo}`);
+      for (const date of data[month]) {
         console.log(`reading ${date}`);
         csvInMonths.push({
           filename: date,
           data: fs.readFileSync(path.join(config.csvExportTo, date), 'utf8')
         });
-      } catch (e) {
-        console.error(e);
-        continue;
       }
+      console.log(`add csv in ${month} to cache `);
+      cache.set(month, csvInMonths, 30000);
+    } else {
+      console.log(`using cache to read ${month}`);
+      csvInMonths = cache.get(month);
     }
-    console.log(`add csv in ${month} to cache `);
-    cache.set(month, csvInMonths, 60000);
-  } else {
-    console.log(`using cache to read ${month}`);
-    csvInMonths = cache.get(month);
-  }
 
-  res.json({
-    month,
-    data: csvInMonths,
-  });
+    res.json({
+      month,
+      data: csvInMonths,
+    });
+  } catch (e) {
+    console.error(e);
+    res.json({
+      month: null,
+      data: [],
+    });
+  }
 });
 
 app.post('/readCSVs', cors(), async (req, res) => {

@@ -148,7 +148,7 @@ function DrawChart(selected, action) {
     renderCharts: (
       <div className={'main'}>
         <a className={'title'}>{month}</a>
-        <a className={'description'} >Data will be cached in server for 60 sec when you selected the month</a>
+        <a className={'description'} >Data will be cached in server for 30 sec when you selected the month</a>
         <div>
           <Stack direction="row" spacing={2}>
             <Button variant="contained" className={'reportButton'} onClick={() => setUsingChart(mur(csvData))}>Customer Monthly Usage report</Button>
